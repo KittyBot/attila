@@ -1,0 +1,608 @@
+// /* ========================================================================== *
+//  * Global module
+//  * -------------------------------------------------------------------------- */
+
+// /* ===================================== *
+//  * Layout
+//  * ------------------------------------- */
+
+// // // Responsive variables
+$large-breakpoint: 900px;
+$small-breakpoint: 800px;
+
+// // Border radius
+// $radius: 5px;
+
+// // Main header height
+// $header-height: 90px; // 90px
+
+// // Universal padding unit
+// $content-padding: 30px; // 30px
+
+// // Repeat a `$string` and number of `$times`
+// @function repeat-string($string, $times) {
+//   $result: '';
+
+//   @for $i from 1 through $times {
+//     $result: $result + $string;
+//   }
+
+//   @return $result;
+// }
+
+// @function first($list) {
+//   @return nth($list, 1);
+// }
+
+// @function last($list) {
+//   @return nth($list, length($list));
+// }
+
+// // Collapse top and/or bottom margin and/or padding from module
+// @mixin collapse($type: both, $direction: both, $level: 1) {
+//   $type-selector: if($type == both, (margin, padding), $type);
+//   $direction-selector: if($direction == both, (-top, -bottom), -$direction);
+
+//   // Build extendable properties placeholder
+//   %properties {
+//     @each $type in $type-selector {
+//       @each $direction in $direction-selector {
+//         #{$type}#{$direction}: 0;
+//       }
+//     }
+//   }
+
+//   @for $i from first($level) through last($level) {
+//     #{repeat-string('> *', $i) + ','} {
+//       @extend %properties;
+//     }
+//   }
+// }
+
+// // Center an element to the viewport regardless of nesting
+// @mixin center-to-viewport {
+//   margin-left: calc(-50vw + 50%);
+//   transform: translateX(calc(50vw - 50%));
+// }
+
+// // Modules with max-width and padding
+// @mixin padded-module($width: 1100px, $padding: $content-padding) {
+//   padding-left: calc(50vw - #{$width / 2});
+//   padding-right: calc(50vw - #{$width / 2});
+
+//   @media (max-width: $width + $padding * 2) {
+//     padding-left: $padding;
+//     padding-right: $padding;
+//   }
+// }
+
+// // Nested full-width modules
+// @mixin nested-module {
+//   width: 100vw;
+//   @include center-to-viewport;
+// }
+
+// // Width-agnostic module backgrounds
+// @mixin cover-background($background: transparent, $offset: null) {
+//   position: relative;
+
+//   &:before {
+//     content: '';
+//     width: 100vw;
+//     position: absolute;
+//     left: calc(-50vw + 50%);
+//     background: $background;
+//     z-index: -1;
+
+//     // Set top offset (if present)
+//     @if $offset != null {
+//       height: calc(100% + #{$offset});
+//       top: -$offset;
+//     } @else {
+//       height: 100%;
+//       top: 0;
+//     }
+//   }
+// }
+
+// /* ===================================== *
+//  * Context
+//  * ------------------------------------- */
+
+// // Normal link state mixin
+// @mixin normal {
+//   &,
+//   &:visited {
+//     @content;
+//   }
+// }
+
+// // Active link state mixin
+// @mixin active {
+//   &:hover,
+//   &:focus,
+//   &:active {
+//     @content;
+//   }
+// }
+
+// // Until width media query mixin
+// @mixin until($width) {
+//   $width: $width - 1;
+//   @media all and (max-width: $width) {
+//     @content;
+//   }
+// }
+
+// // At least width media query mixin
+// @mixin at-least($width) {
+//   @media all and (min-width: $width) {
+//     @content;
+//   }
+// }
+
+// // Between widths media query mixin
+// @mixin between($small-width, $large-width) {
+//   $large-width: $large-width - 1;
+//   @media (max-width: $large-width) and (min-width: $small-width) {
+//     @content;
+//   }
+// }
+
+// // High resolution screens media query mixin
+// @mixin hdpi {
+//   @media (min-device-pixel-ratio: 2), (min-resolution: 192dpi), (min-resolution: 2dppx) {
+//     @content;
+//   }
+// }
+
+// // Standard resolution screens media query mixin
+// @mixin sdpi {
+//   @media (max-device-pixel-ratio: 1.99), (max-resolution: 191dpi), (min-resolution: 1.99dppx) {
+//     @content;
+//   }
+// }
+
+// /* ===================================== *
+//  * Visibility
+//  * ------------------------------------- */
+
+// // Visually hidden mixin
+// @mixin hidden() {
+//   position: absolute;
+//   top: -9999px;
+//   left: -9999px;
+// }
+
+// // Visually hidden placeholder
+// %hidden {
+//   @include hidden;
+// }
+
+// // Visually shown mixin
+// @mixin shown($position: initial) {
+//   position: $position;
+//   top: initial;
+//   left: initial;
+// }
+
+// // Visually shown placeholder
+// %shown {
+//   @include shown;
+// }
+
+/* ========================================================================== *
+ * Global module
+ * -------------------------------------------------------------------------- */
+
+/* ===================================== *
+ * Utility
+ * ------------------------------------- */
+
+// Remove the unit of a length
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+
+  @return $number;
+}
+
+// Default browser font size
+$browser-context: 16;
+
+// Easily convert pixels to ems
+@function em($pixels, $context: $browser-context) {
+  @return #{$pixels/$context}em;
+}
+
+/* ===================================== *
+ * Color
+ * ------------------------------------- */
+
+// Slightly lighten a color
+@function tint($color, $percentage) {
+  @return mix(white, $color, $percentage);
+}
+
+// Slightly darken a color
+@function shade($color, $percentage) {
+  @return mix(black, $color, $percentage);
+}
+
+// Encode colors - doesn’t work with strings containing alpha
+@function encodecolor($string) {
+  @if type-of($string) == 'color' {
+    $hex: str-slice(ie-hex-str($string), 4);
+    $string:unquote("#{$hex}");
+  }
+  $string: '%23' + $string;
+  @return $string;
+}
+
+// Palette - names from http://www.htmlcsscolor.com
+$green-1:     #6CECA1; // Medium aquamarine
+$green-2:     #4FDC96; // Shamrock
+$green-3:     #19BF81; // Mountain meadow
+$green-4:     #0D9E74; // Free speech aquamarine
+$green-5:     #0A7E5D; // Deep sea
+
+$red-1:       #FF5A52; // Tomato
+$red-2:       #FF3127; // Red orange
+$red-3:       #FA0D12; // Torch red
+$red-4:       #D50912; // Fire engine red
+$red-5:       #B00513; // Venetian red
+
+$violet-1:    #DBA6FA; // Mauve
+$violet-2:    #D18DF9; // Heliotrope
+$violet-3:    #C774F7; // Deep lilac
+$violet-4:    #AE4CEF; // Medium orchid
+$violet-5:    #8836C8; // Dark orchid
+
+$blue-1:      #CBE2FF; // Hawkes blue
+$blue-2:      #98C5ff; // Light sky blue
+$blue-3:      #65A8FF; // Jordy blue
+$blue-4:      #5381FF; // Cornflower blue
+$blue-5:      #4960BF; // Free speech blue
+
+$turquoise-1: #9AE6FF; // Columbia blue
+$turquoise-2: #61D8FF; // Turquoise
+$turquoise-3: #34B4FF; // Summer sky
+$turquoise-4: #1A9AEC; // Dodger blue
+$turquoise-5: #0080D8; // Navy blue
+
+$yellow-1:    #FFDA4C; // Mustard
+$yellow-2:    #FFCA16; // Turbo
+$yellow-3:    #F4B000; // Selective yellow
+$yellow-4:    #CB9200; // Dark goldenrod
+
+$pink-1:      #FF7AAE; // Tea rose
+$pink-2:      #FF4D75; // Wild watermelon
+$pink-3:      #FF2A49; // Radical red
+
+$white-1: hsl(213, 60%, 100%); // White
+$white-2: hsl(213, 60%, 97%);  // Alice blue
+$white-3: hsl(213, 50%, 92%);  // Solitude
+$white-4: hsl(213, 40%, 87%);  // Hawkes blue
+$white-5: hsl(213, 30%, 82%);  // Link water
+
+$gray-1:      #8FA9BC; // Nepal
+$gray-2:      #809DB3; // Bali hai
+$gray-3:      #7091A9; // Bermuda gray
+$gray-4:      #60859F; // Air force blue
+$gray-5:      #56788F; // Wedgewood
+
+$black-1:     #3E5E74; // Matisse
+$black-2:     #325167; // Cello
+$black-3:     #264459; // Astronaut blue
+$black-4:     #1C374A; // Blue whale
+$black-5:     #132939; // Tangeroa
+
+/* ===================================== *
+ * Context
+ * ------------------------------------- */
+
+// Normal link state mixin
+@mixin normal {
+  &,
+  &:visited {
+    @content;
+  }
+}
+
+// Active link state mixin
+@mixin active {
+  &:hover,
+  &:focus,
+  &:active {
+    @content;
+  }
+}
+
+// Until width media query mixin
+@mixin until($width) {
+  $width: $width - 1;
+  @media all and (max-width: $width) {
+    @content;
+  }
+}
+
+// At least width media query mixin
+@mixin at-least($width) {
+  @media all and (min-width: $width) {
+    @content;
+  }
+}
+
+// Between widths media query mixin
+@mixin between($small-width, $large-width) {
+  $large-width: $large-width - 1;
+  @media (max-width: $large-width) and (min-width: $small-width) {
+    @content;
+  }
+}
+
+// High resolution screens media query mixin
+@mixin hdpi {
+  @media (min-device-pixel-ratio: 2), (min-resolution: 192dpi), (min-resolution: 2dppx) {
+    @content;
+  }
+}
+
+// Standard resolution screens media query mixin
+@mixin sdpi {
+  @media (max-device-pixel-ratio: 1.99), (max-resolution: 191dpi), (min-resolution: 1.99dppx) {
+    @content;
+  }
+}
+
+/* ===================================== *
+ * Text
+ * ------------------------------------- */
+
+// Fonts stacks
+$base-font: -apple-system, BlinkMacSystemFont, 'Avenir Next', Avenir, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+$mono-font: 'SFMono-Regular', 'Roboto Mono', Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace;
+
+// Default font size & line spacing
+$base-size: 19px;
+$base-weight: 400;
+$base-line-height: 1.5;
+
+// Smooth fonts are smooth
+@mixin font-smoothing($value: on) {
+  @if $value == on {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  } @else {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+}
+
+// 1.15 modular scale - http://www.modularscale.com/?19&px&1.15
+$headings: (
+  1: 2.072em,
+  2: 1.802em,
+  3: 1.602em,
+  4: 1.424em,
+  5: 1.266em,
+  6: 1.125em
+);
+
+// Inline links
+@mixin inline-link($normal: null, $active: $blue-3) {
+  text-decoration: none;
+  transition: color $duration;
+  background: linear-gradient(to right, rgba($active, .75), rgba($active, .75)) 0 calc(100% - .03125em) / 100% 1px no-repeat;
+
+  // Default state
+  @include normal {
+    color: $normal or inherit;
+  }
+
+  // Active state
+  @include active {
+    color: $active;
+  }
+}
+
+/* ===================================== *
+ * Animations
+ * ------------------------------------- */
+
+// Transition duration
+$duration: .2s;
+
+// Class to prevent transitions
+.full-stop * {
+  &,
+  &:after,
+  &:before {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ===================================== *
+ * Layout
+ * ------------------------------------- */
+
+// Block-level elements that get vertical margin
+$block-elements: p, ul, ol, h1, h2, h3, h4, h5, h6, pre, table, blockquote, hr, ':not(label) > input, :not(label) > select, :not(label) > textarea', '.inline-notification', '.input-group', '.toggle-group';
+
+// Strong elements that get darker color
+$strong-elements: h1, h2, h3, h4, h5, h6, dt, th, strong, b, 'ul li:before';
+
+// Border radius
+$radius: 5px;
+
+// Card padding
+$card-padding: 24px;
+$large-card-padding: 32px;
+
+// Content padding
+$content-padding: 30px;
+$section-padding: 90px;
+
+// Height for wave elements
+$wave-height: 145px;
+$pinch-height: 110px;
+
+$small-wave-breakpoint: 700px;
+$large-wave-breakpoint: 1200px;
+
+// Vertical margin
+$vertical-margin: round($base-size * 1.5);
+
+// Main header height
+$header-height: 90px;
+
+// Inner header height
+$inner-header-height: 50px;
+
+// Sidebar width
+$sidebar-width: auto;
+
+// Point at which mobile menu is visible
+$breakpoint: 800px;
+
+// Collapse top margin
+@mixin collapse-top {
+  > *:first-child,
+  > *:first-child > *:first-child,
+  > *:first-child > *:first-child > *:first-child {
+    margin-top: 0;
+  }
+}
+
+// Collapse bottom margin
+@mixin collapse-bottom {
+  > *:last-child,
+  > *:last-child > *:last-child,
+  > *:last-child > *:last-child > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Modules with max-width (uses only padding)
+@mixin padded-module($width: 1100px, $padding: $content-padding, $nested: false) {
+  padding-left: calc(50vw - #{$width / 2});
+  padding-right: calc(50vw - #{$width / 2});
+
+  @if $nested {
+    width: 100vw;
+  }
+
+  @if $padding {
+    @media (max-width: $width + $padding * 2) {
+      padding-left: $padding;
+      padding-right: $padding;
+    }
+  }
+}
+
+// Modules with max-width (uses max-width and margin)
+@mixin centered-module($width: 1100px, $padding: $content-padding) {
+  width: 100%;
+
+  @if $padding {
+    max-width: $width + $content-padding * 2;
+    padding-left: $padding;
+    padding-right: $padding;
+  } @else {
+    max-width: $width;
+  }
+}
+
+// Align inner text and maintain padding
+@mixin breakout-padding($amount: $content-padding) {
+  padding: $amount;
+  margin-left: -$amount;
+  width: calc(100% + #{$amount * 2});
+}
+
+// Center an element to the viewport regardless of nesting
+@mixin center-to-viewport {
+  margin-left: calc(-50vw + 50%);
+  transform: translateX(calc(50vw - 50%));
+}
+
+// Section background setup (for use with wave and pinch mixins)
+@mixin section-background {
+  width: 100%;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 100% 100%;
+  backface-visibility: hidden;
+}
+
+// Pinched SVG section backgrounds
+@mixin pinch($color: $white-1, $offset: false) {
+  @if $offset {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 104' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' clip-rule='evenodd'%3E%3Cpath d='M-123.316 70.163c22.79-14.32 49.856-23.012 76.561-30.097 38.612-10.245 78.032-17.874 117.994-22.949 129.348-16.429 260.85-21.668 390.83-12.931 190.318 12.012 330.995 63.321 515.826 73.88 116.29 6.643 233.195 4.725 348.887-7.758 48.847-5.271 97.161-12.902 144.655-24.168 31.967-7.583 64.776-17.024 91.873-34.049v92.908h-1686.626v-34.837z' fill='#{encodecolor($color)}'/%3E%3C/svg%3E");
+
+    @include until($small-wave-breakpoint) {
+      height: $wave-height / 2;
+    }
+
+    @include between($small-wave-breakpoint, $large-wave-breakpoint) {
+      height: 10vw;
+    }
+
+    @include at-least($small-wave-breakpoint) {
+      height: $wave-height;
+    }
+  } @else {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1088 60' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1087.5 60h-1087.5v-.759c232.821 0 336.464-59.241 543.75-59.241l1.213.001c206.478.23 310.171 59.24 542.537 59.24v.759z' fill='#{encodecolor($color)}' /%3E%3C/svg%3E");
+
+    @include until($small-wave-breakpoint) {
+      height: $pinch-height / 2;
+    }
+
+    @include between($small-wave-breakpoint, $large-wave-breakpoint) {
+      height: 10vw;
+    }
+
+    @include at-least($small-wave-breakpoint) {
+      height: $pinch-height;
+    }
+  }
+}
+
+/* ===================================== *
+ * Visibility
+ * ------------------------------------- */
+
+// Visually hidden mixin
+@mixin hidden() {
+  border: 0 !important;
+  clip: rect(0 0 0 0) !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: absolute !important;
+  white-space: nowrap !important;
+  width: 1px !important;
+}
+
+// Visually hidden class (obvi)
+.hidden {
+  @include hidden;
+}
+
+// Whiten svg graphics mixin
+@mixin whiten($background: $blue-3, $foreground: $white-1) {
+  .light {
+    fill: $foreground;
+  }
+
+  .dark {
+    fill: $background;
+  }
+
+  .translucent {
+    fill-opacity: .5;
+  }
+}

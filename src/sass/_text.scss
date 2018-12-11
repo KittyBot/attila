@@ -1,0 +1,309 @@
+/* ========================================================================== *
+ * Text module
+ * -------------------------------------------------------------------------- */
+
+/* ===================================== *
+ * Utility
+ * ------------------------------------- */
+
+// Make sure strong elements’ color matches parent
+@mixin match-color {
+  #{$strong-elements} {
+    color: inherit;
+  }
+}
+
+/* ===================================== *
+ * Common
+ * ------------------------------------- */
+
+body,
+input,
+select,
+button,
+textarea {
+  color: $black-1;
+  font: #{$base-weight} #{$base-size} / #{$base-line-height} #{$base-font};
+  font-feature-settings: 'kern', 'liga', 'pnum';
+  text-rendering: geometricPrecision;
+  @include font-smoothing;
+
+  @include until(1000px) {
+    font-size: $base-size - 2px;
+  }
+}
+
+/* ===================================== *
+ * Strong element / heading
+ * ------------------------------------- */
+
+#{$strong-elements} {
+  color: $black-5;
+  font-weight: 600;
+  letter-spacing: -.012em;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.15;
+  letter-spacing: normal;
+}
+
+@for $i from 1 through length($headings) {
+  h#{$i} {
+    font-size: map-get($headings, $i);
+  }
+}
+
+/* ===================================== *
+ * Strong
+ * ------------------------------------- */
+
+/* ===================================== *
+ * Blockquote
+ * ------------------------------------- */
+
+// Blockquotes
+blockquote {
+  font-size: 1.2em;
+  line-height: 1.25;
+  font-weight: 500;
+  position: relative;
+  background: rgba($blue-5, .1);
+}
+
+blockquote:before,
+blockquote:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 0 solid transparent;
+
+}
+
+blockquote:before {
+  right: -6px;
+  top: -6px;
+  border-bottom-width: 40px;
+  border-top-width: 0px;
+  border-right: 40px solid rgba($violet-5, .45);
+}
+
+blockquote:after {
+  left: -6px;
+  bottom: -6px;
+  border-top-width: 40px;
+  border-bottom-width: 0px;
+  border-left: 40px solid rgba($violet-5, .45);
+}
+
+blockquote p {
+  margin: 0;
+}
+
+blockquote p:first-of-type {
+  position: relative;
+}
+
+blockquote p:first-of-type:before,
+blockquote p:first-of-type:after {
+  position: absolute;
+  color: rgba($violet-5, .45);
+  font: 700 1.5em/1 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+blockquote p:first-of-type:before {
+  content: '“';
+  left: -.6em;
+}
+
+blockquote p:last-of-type:after {
+  content: '”';
+  margin-left: .1em;
+}
+
+blockquote p + p {
+  margin-top: $vertical-margin;
+}
+
+blockquote cite {
+  display: block;
+  font-style: normal;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: $vertical-margin;
+}
+
+/* ===================================== *
+ * Inline
+ * ------------------------------------- */
+
+// Subscripts & superscripts
+sub,
+sup {
+  vertical-align: baseline;
+  position: relative;
+  line-height: 0;
+  font-size: 75%;
+}
+
+sub {
+  bottom: -.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+// Highlighted marks
+mark {
+  background: lighten($yellow-1, 15);
+}
+
+// Definitions & Abbreviations
+dfn[title],
+abbr[title] {
+  position: relative;
+  cursor: help;
+  font-style: normal;
+  border-bottom: 1px dashed $white-5;
+
+  &:after,
+  &:before {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+    transition: $duration;
+  }
+
+  &:after {
+    content: attr(title);
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    color: $white-1;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    padding: 2px 10px;
+    border-radius: $radius;
+    background: $black-3;
+  }
+
+  &:before {
+    content: '';
+    left: calc(50% - 5px);
+    top: 100%;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 5px 6px 5px;
+    border-color: transparent transparent $black-3 transparent;
+  }
+
+  &:hover:after,
+  &:hover:before {
+    opacity: 1;
+    z-index: 2;
+  }
+}
+
+// Links & buttons
+a,
+button {
+  cursor: pointer;
+  text-decoration: none;
+
+  &.inline {
+    @include inline-link;
+  }
+
+  @include normal {
+    color: inherit;
+  }
+
+  @include active {
+    color: inherit;
+  }
+}
+
+/* ===================================== *
+ * Horizontal rule
+ * ------------------------------------- */
+
+hr {
+  border: solid $white-5;
+  border-width: 1px 0 0 0;
+}
+
+/* ===================================== *
+ * Preformatted text
+ * ------------------------------------- */
+
+pre,
+code,
+kbd,
+samp {
+  font-family: $mono-font;
+  direction: ltr;
+  text-align: left;
+  tab-size: 2;
+  hyphens: none;
+  tab-size: 2;
+  hyphens: none;
+}
+
+pre {
+  overflow: auto;
+  padding: 1.275em;
+  border-radius: $radius;
+  background: $white-2;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+:not(pre) > code,
+:not(pre) > kbd,
+:not(pre) > samp {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  letter-spacing: normal;
+  border-radius: $radius;
+  padding: 0 .375em .075em;
+  background: $white-2;
+}
+
+pre,
+:not(pre) > code,
+:not(pre) > kbd,
+:not(pre) > samp {
+  font-size: .94em;
+}
+
+/* ===================================== *
+ * Text alignment
+ * ------------------------------------- */
+
+.left-aligned-text {
+  text-align: left;
+
+  table &:first-child .button:last-child {
+    margin-right: -8px;
+  }
+}
+
+.right-aligned-text {
+  text-align: right;
+
+  table &:last-child .button:last-child {
+    margin-right: -8px;
+  }
+}
+
+.centered-text {
+  text-align: center;
+}
